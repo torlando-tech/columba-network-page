@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Columba — Encrypted Mesh Messaging for Android</title>
+  <meta name="description" content="Message freely without internet. Columba is an open-source Android messenger for the Reticulum network — encrypted, decentralized, and resilient.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Columba — Encrypted Mesh Messaging">
+  <meta property="og:description" content="Message freely without internet. Open-source Android messenger for the Reticulum network.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://columba.network">
+  <meta property="og:image" content="https://columba.network/assets/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <!-- Nav -->
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="#" class="nav__brand" aria-label="Columba home">
+        <svg class="nav__icon" viewBox="0 0 512 512" width="32" height="32" aria-hidden="true">
+          <defs>
+            <linearGradient id="nav-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0" stop-color="#C471ED"/>
+              <stop offset="1" stop-color="#F64F59"/>
+            </linearGradient>
+            <radialGradient id="nav-glow">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.8"/>
+              <stop offset="0.5" stop-color="#fff" stop-opacity="0.3"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="256" cy="256" r="256" fill="url(#nav-bg)"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M93.53 128.431C94.162 128.471 271.37 194.336 271.29 193.077"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M270.75 193.487C270.902 226.855 231.12 378.151 216.617 402.841"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M270.923 193.326C281.938 183.739 347.714 144.654 356.069 139.108"/>
+          <circle cx="406.658" cy="182.257" r="20.163" fill="url(#nav-glow)"/>
+          <circle cx="406.658" cy="182.257" r="9" fill="#fff"/>
+          <circle cx="356.658" cy="138.257" r="28.322" fill="url(#nav-glow)"/>
+          <circle cx="356.658" cy="138.257" r="10.837" fill="#fff"/>
+          <circle cx="270.658" cy="193.257" r="16" fill="url(#nav-glow)"/>
+          <circle cx="270.658" cy="193.257" r="6.5" fill="#fff"/>
+          <circle cx="214.658" cy="403.257" r="16" fill="url(#nav-glow)"/>
+          <circle cx="214.658" cy="403.257" r="6.5" fill="#fff"/>
+          <circle cx="93.506" cy="128.312" r="13" fill="url(#nav-glow)"/>
+          <circle cx="93.506" cy="128.312" r="5" fill="#fff"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M405.781 182.043C381.14 160.276 371.817 147.932 356.85 138.219"/>
+          <circle cx="230.634" cy="178.62" r="11.949" fill="url(#nav-glow)"/>
+          <circle cx="230.634" cy="178.62" r="5.334" fill="#fff"/>
+        </svg>
+        <span class="nav__wordmark">Columba</span>
+      </a>
+
+      <button class="nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu">
+        <span class="nav__toggle-bar"></span>
+        <span class="nav__toggle-bar"></span>
+        <span class="nav__toggle-bar"></span>
+      </button>
+
+      <div class="nav__menu" id="nav-menu">
+        <ul class="nav__list">
+          <li><a href="#features" class="nav__link">Features</a></li>
+          <li><a href="#how-it-works" class="nav__link">How It Works</a></li>
+          <li><a href="#download" class="nav__link">Download</a></li>
+          <li><a href="https://github.com/torlando-tech/columba" class="nav__link" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="hero">
+    <canvas class="hero__canvas" id="constellation-canvas" aria-hidden="true" role="presentation"></canvas>
+    <div class="hero__content">
+      <div class="hero__icon-wrap">
+        <svg class="hero__icon" viewBox="0 0 512 512" width="120" height="120" aria-hidden="true">
+          <defs>
+            <linearGradient id="hero-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0" stop-color="#C471ED"/>
+              <stop offset="1" stop-color="#F64F59"/>
+            </linearGradient>
+            <radialGradient id="hero-glow">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.8"/>
+              <stop offset="0.5" stop-color="#fff" stop-opacity="0.3"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="256" cy="256" r="256" fill="url(#hero-bg)"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M93.53 128.431C94.162 128.471 271.37 194.336 271.29 193.077"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M270.75 193.487C270.902 226.855 231.12 378.151 216.617 402.841"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M270.923 193.326C281.938 183.739 347.714 144.654 356.069 139.108"/>
+          <circle cx="406.658" cy="182.257" r="20.163" fill="url(#hero-glow)"/>
+          <circle cx="406.658" cy="182.257" r="9" fill="#fff"/>
+          <circle cx="356.658" cy="138.257" r="28.322" fill="url(#hero-glow)"/>
+          <circle cx="356.658" cy="138.257" r="10.837" fill="#fff"/>
+          <circle cx="270.658" cy="193.257" r="16" fill="url(#hero-glow)"/>
+          <circle cx="270.658" cy="193.257" r="6.5" fill="#fff"/>
+          <circle cx="214.658" cy="403.257" r="16" fill="url(#hero-glow)"/>
+          <circle cx="214.658" cy="403.257" r="6.5" fill="#fff"/>
+          <circle cx="93.506" cy="128.312" r="13" fill="url(#hero-glow)"/>
+          <circle cx="93.506" cy="128.312" r="5" fill="#fff"/>
+          <path stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.6" d="M405.781 182.043C381.14 160.276 371.817 147.932 356.85 138.219"/>
+          <circle cx="230.634" cy="178.62" r="11.949" fill="url(#hero-glow)"/>
+          <circle cx="230.634" cy="178.62" r="5.334" fill="#fff"/>
+        </svg>
+      </div>
+      <h1 class="hero__title">Columba</h1>
+      <p class="hero__tagline">Message freely. No internet required.</p>
+      <p class="hero__subtitle">Encrypted mesh messaging over Bluetooth, WiFi, LoRa, and beyond.</p>
+      <div class="hero__ctas">
+        <a href="https://github.com/torlando-tech/columba/releases" class="btn btn--primary">Download for Android</a>
+        <a href="https://github.com/torlando-tech/columba" class="btn btn--ghost" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+      </div>
+    </div>
+    <div class="hero__scroll-hint" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Features -->
+    <section class="section features" id="features">
+      <div class="container">
+        <h2 class="section__heading reveal">Why Columba</h2>
+        <div class="features__grid">
+          <div class="card reveal">
+            <div class="card__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#icon-grad-1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="icon-grad-1" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <circle cx="24" cy="24" r="10"/>
+                <path d="M2 24h8M38 24h8M24 2v8M24 38v8"/>
+                <path d="M7 7l6 6M35 7l-6 6M7 41l6-6M35 41l-6-6" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="card__title">No Internet Needed</h3>
+            <p class="card__desc">Works without cell towers, servers, or internet. Your messages find their way through the mesh.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#icon-grad-2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="icon-grad-2" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <rect x="8" y="4" width="32" height="40" rx="4"/>
+                <circle cx="24" cy="22" r="6"/>
+                <path d="M16 36c0-4.418 3.582-8 8-8s8 3.582 8 8"/>
+                <path d="M18 12h12" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="card__title">Encrypted by Default</h3>
+            <p class="card__desc">End-to-end encryption on every message. No accounts, no tracking, no central servers.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#icon-grad-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="icon-grad-3" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <circle cx="12" cy="24" r="4"/>
+                <circle cx="36" cy="12" r="4"/>
+                <circle cx="36" cy="36" r="4"/>
+                <path d="M16 24l16-10M16 24l16 10"/>
+                <circle cx="24" cy="6" r="3" opacity="0.5"/>
+                <circle cx="24" cy="42" r="3" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="card__title">Multiple Transports</h3>
+            <p class="card__desc">Bluetooth LE for nearby, WiFi at home, LoRa via RNode for distance, or TCP to reach the world.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#icon-grad-4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="icon-grad-4" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <path d="M12 28c-2-2-4-5-4-8a8 8 0 0116 0c0 3-2 6-4 8"/>
+                <path d="M28 28c-2-2-4-5-4-8a8 8 0 0116 0c0 3-2 6-4 8"/>
+                <path d="M14 34h20M18 40h12" opacity="0.7"/>
+              </svg>
+            </div>
+            <h3 class="card__title">Voice Calls</h3>
+            <p class="card__desc">Make encrypted voice calls right over the mesh network. No SIM card or phone number required.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#icon-grad-5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="icon-grad-5" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <rect x="6" y="14" width="24" height="28" rx="3"/>
+                <path d="M12 20h12M12 26h8" opacity="0.5"/>
+                <rect x="18" y="6" width="24" height="28" rx="3"/>
+                <path d="M24 12h12M24 18h8" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="card__title">Your Identity, Your Device</h3>
+            <p class="card__desc">Cryptographic identity generated on your device. Share via QR code. No phone number needed.</p>
+          </div>
+          <div class="card reveal">
+            <div class="card__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#icon-grad-6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="icon-grad-6" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <path d="M18 6l-6 6 6 6"/>
+                <path d="M30 6l6 6-6 6"/>
+                <path d="M26 4l-4 16"/>
+                <path d="M8 30h32v12a2 2 0 01-2 2H10a2 2 0 01-2-2V30z"/>
+                <circle cx="24" cy="37" r="2"/>
+              </svg>
+            </div>
+            <h3 class="card__title">Open Source</h3>
+            <p class="card__desc">MIT licensed and fully auditable. Inspect the code, contribute, or fork it yourself.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section how-it-works" id="how-it-works">
+      <div class="container">
+        <h2 class="section__heading reveal">How It Works</h2>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#step-grad-1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="step-grad-1" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <circle cx="24" cy="16" r="8"/>
+                <path d="M12 40c0-6.627 5.373-12 12-12s12 5.373 12 12"/>
+                <path d="M30 14l4-4M34 14v-4h-4" opacity="0.6"/>
+              </svg>
+            </div>
+            <h3 class="step__title">Create Identity</h3>
+            <p class="step__desc">Generate a cryptographic identity on your device in seconds. No email, no phone number.</p>
+          </div>
+          <div class="step__connector" aria-hidden="true">
+            <svg viewBox="0 0 80 4" width="80" height="4" preserveAspectRatio="none">
+              <line x1="0" y1="2" x2="80" y2="2" stroke="url(#conn-grad)" stroke-width="2" stroke-dasharray="6 4"/>
+              <defs><linearGradient id="conn-grad" x1="0" y1="0" x2="80" y2="0"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+            </svg>
+          </div>
+          <div class="step reveal">
+            <div class="step__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#step-grad-2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="step-grad-2" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <circle cx="14" cy="24" r="5"/>
+                <circle cx="34" cy="14" r="5"/>
+                <circle cx="34" cy="34" r="5"/>
+                <path d="M19 22l10-6M19 26l10 6"/>
+              </svg>
+            </div>
+            <h3 class="step__title">Connect</h3>
+            <p class="step__desc">Enable Bluetooth, WiFi, or plug in an RNode. Columba discovers peers automatically.</p>
+          </div>
+          <div class="step__connector" aria-hidden="true">
+            <svg viewBox="0 0 80 4" width="80" height="4" preserveAspectRatio="none">
+              <line x1="0" y1="2" x2="80" y2="2" stroke="url(#conn-grad)" stroke-width="2" stroke-dasharray="6 4"/>
+            </svg>
+          </div>
+          <div class="step reveal">
+            <div class="step__icon">
+              <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="url(#step-grad-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="step-grad-3" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <path d="M6 10h28a4 4 0 014 4v4a4 4 0 01-4 4H10a4 4 0 00-4 4v4a4 4 0 004 4h28"/>
+                <circle cx="40" cy="34" r="4"/>
+                <path d="M12 16h8" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="step__title">Message</h3>
+            <p class="step__desc">Send encrypted messages that hop across the mesh until they reach their destination.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transport Showcase -->
+    <section class="section transports" id="transports">
+      <div class="container">
+        <h2 class="section__heading reveal">Connect Your Way</h2>
+        <div class="transports__grid">
+          <div class="transport-card reveal">
+            <div class="transport-card__icon">
+              <svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="url(#t-grad-1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="t-grad-1" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <path d="M18 16l6-8 6 8-6 8-6-8z"/>
+                <path d="M24 24v16"/>
+                <path d="M18 36h12"/>
+              </svg>
+            </div>
+            <h3 class="transport-card__title">Bluetooth LE</h3>
+            <p class="transport-card__range">~100m range</p>
+            <p class="transport-card__desc">Connect to anyone nearby, anywhere. No infrastructure needed.</p>
+          </div>
+          <div class="transport-card reveal">
+            <div class="transport-card__icon">
+              <svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="url(#t-grad-2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="t-grad-2" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <path d="M12 34C8 30 6 26 6 22"/>
+                <path d="M18 30c-2-2-4-5-4-8"/>
+                <circle cx="24" cy="24" r="3"/>
+                <path d="M30 30c2-2 4-5 4-8"/>
+                <path d="M36 34c4-4 6-8 6-12"/>
+                <path d="M20 40h8"/>
+              </svg>
+            </div>
+            <h3 class="transport-card__title">WiFi</h3>
+            <p class="transport-card__range">Home & local</p>
+            <p class="transport-card__desc">Use your existing WiFi network for faster local mesh connections.</p>
+          </div>
+          <div class="transport-card reveal">
+            <div class="transport-card__icon">
+              <svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="url(#t-grad-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="t-grad-3" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <path d="M24 4v18"/>
+                <path d="M18 8l6-4 6 4"/>
+                <path d="M14 12l10-4 10 4"/>
+                <rect x="10" y="28" width="28" height="16" rx="3"/>
+                <circle cx="24" cy="36" r="3"/>
+                <path d="M16 32h16" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="transport-card__title">LoRa / RNode</h3>
+            <p class="transport-card__range">Up to 20+ km</p>
+            <p class="transport-card__desc">Long-range radio with an RNode device. Reach across mountains and valleys.</p>
+          </div>
+          <div class="transport-card reveal">
+            <div class="transport-card__icon">
+              <svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="url(#t-grad-4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs><linearGradient id="t-grad-4" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#C471ED"/><stop offset="1" stop-color="#F64F59"/></linearGradient></defs>
+                <circle cx="24" cy="24" r="18"/>
+                <ellipse cx="24" cy="24" rx="8" ry="18"/>
+                <path d="M6 24h36"/>
+                <path d="M8 14h32" opacity="0.5"/>
+                <path d="M8 34h32" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3 class="transport-card__title">TCP / Internet</h3>
+            <p class="transport-card__range">Global reach</p>
+            <p class="transport-card__desc">Connect to any Reticulum transport node worldwide when internet is available.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy Statement -->
+    <section class="section privacy" id="privacy">
+      <div class="container">
+        <blockquote class="privacy__quote reveal">
+          No accounts. No servers. No tracking.<br>Just encrypted packets between you and the people you choose.
+        </blockquote>
+        <div class="privacy__badges">
+          <div class="badge reveal">
+            <svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="#C471ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="12" width="24" height="18" rx="3"/>
+              <path d="M10 12V8a6 6 0 1112 0v4"/>
+              <circle cx="16" cy="22" r="2"/>
+            </svg>
+            <span>End-to-end encrypted</span>
+          </div>
+          <div class="badge reveal">
+            <svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="#D96080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="16" cy="16" r="4"/>
+              <circle cx="6" cy="8" r="3"/>
+              <circle cx="26" cy="8" r="3"/>
+              <circle cx="6" cy="24" r="3"/>
+              <circle cx="26" cy="24" r="3"/>
+              <path d="M13 13l-5-3M19 13l5-3M13 19l-5 3M19 19l5 3"/>
+            </svg>
+            <span>No central servers</span>
+          </div>
+          <div class="badge reveal">
+            <svg viewBox="0 0 32 32" width="28" height="28" fill="none" stroke="#F64F59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 4l-6 6 6 6"/>
+              <path d="M26 4l-6 6 6 6"/>
+              <path d="M22 2l-4 16"/>
+              <path d="M6 22h20v8H6z"/>
+              <circle cx="16" cy="26" r="1.5"/>
+            </svg>
+            <span>MIT License</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section class="section download" id="download">
+      <div class="container">
+        <h2 class="section__heading reveal">Get Columba</h2>
+        <div class="download__content reveal">
+          <a href="https://github.com/torlando-tech/columba/releases" class="btn btn--primary btn--large">Download for Android</a>
+          <div class="download__obtainium">
+            <a href="https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/torlando-tech/columba">
+              <img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" height="50" alt="Get it on Obtainium" loading="lazy">
+            </a>
+          </div>
+          <p class="download__note">Android 12+ required. No Play Store account needed.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community -->
+    <section class="section community" id="community">
+      <div class="container">
+        <h2 class="section__heading reveal">Community</h2>
+        <p class="section__subtitle reveal">Built by volunteers who believe communication is a right, not a service.</p>
+        <div class="community__grid">
+          <div class="community__col reveal">
+            <h3>Contribute</h3>
+            <ul>
+              <li><a href="https://github.com/torlando-tech/columba" target="_blank" rel="noopener noreferrer">Source Code</a></li>
+              <li><a href="https://github.com/torlando-tech/columba/issues" target="_blank" rel="noopener noreferrer">Report Issues</a></li>
+            </ul>
+          </div>
+          <div class="community__col reveal">
+            <h3>Learn More</h3>
+            <ul>
+              <li><a href="https://reticulum.network/" target="_blank" rel="noopener noreferrer">Reticulum Docs</a></li>
+              <li><a href="https://github.com/markqvist/LXMF" target="_blank" rel="noopener noreferrer">LXMF Protocol</a></li>
+            </ul>
+          </div>
+          <div class="community__col reveal">
+            <h3>Support</h3>
+            <ul>
+              <li><a href="https://ko-fi.com/torlandotech" target="_blank" rel="noopener noreferrer">Ko-fi</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__tagline">Columba &mdash; Latin for &ldquo;dove.&rdquo; A constellation in the southern sky.</p>
+      <div class="footer__links">
+        <a href="https://github.com/torlando-tech/columba" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a href="https://ko-fi.com/torlandotech" target="_blank" rel="noopener noreferrer" aria-label="Ko-fi">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.699-.951-1.175-2.681-.196-3.826 1.114-1.302 3.263-.889 4.2.442.956-1.331 3.087-1.744 4.201-.442.979 1.146.504 2.876-.195 3.826l.453.045z"/></svg>
+        </a>
+      </div>
+      <p class="footer__copy">&copy; 2025 Columba Contributors. MIT License.</p>
+    </div>
+  </footer>
+
+  <script src="js/constellation.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
