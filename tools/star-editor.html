@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Constellation Star Editor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0D0B1A; color: #eee; font-family: 'Inter', system-ui, sans-serif; }
+  #toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    background: rgba(13,11,26,0.95); backdrop-filter: blur(8px);
+    padding: 8px 16px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    flex-wrap: wrap;
+  }
+  #toolbar label { font-size: 13px; color: #aaa; }
+  #toolbar select, #toolbar button {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: #eee; padding: 4px 10px; border-radius: 4px; font-size: 13px; cursor: pointer;
+  }
+  #toolbar button:hover { background: rgba(255,255,255,0.15); }
+  #toolbar button.primary { background: linear-gradient(135deg, #C471ED, #F64F59); border: none; font-weight: 600; }
+  #toolbar .sep { width: 1px; height: 20px; background: rgba(255,255,255,0.15); }
+  canvas { display: block; cursor: crosshair; }
+  #output-panel {
+    position: fixed; right: 0; top: 46px; bottom: 0; width: 420px;
+    background: rgba(13,11,26,0.97); border-left: 1px solid rgba(255,255,255,0.1);
+    overflow-y: auto; z-index: 10; display: none;
+  }
+  #output-panel.open { display: block; }
+  #output-panel pre {
+    font-size: 11px; line-height: 1.5; padding: 12px; color: #C471ED;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  #output-panel .header {
+    padding: 8px 12px; background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; font-weight: 600; display: flex; justify-content: space-between;
+  }
+  #status {
+    position: fixed; bottom: 12px; left: 12px; z-index: 10;
+    font-size: 12px; color: rgba(255,255,255,0.5); pointer-events: none;
+  }
+  #ref-image { display: none; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <label>Focus:</label>
+  <select id="focus-select"><option value="all">All Constellations</option></select>
+  <div class="sep"></div>
+  <label>Reference:</label>
+  <button id="btn-ref">Load Image</button>
+  <input type="file" id="ref-input" accept="image/*" style="display:none">
+  <input type="range" id="ref-opacity" min="0" max="100" value="30" style="width:80px" title="Reference opacity">
+  <div class="sep"></div>
+  <button id="btn-add-star">+ Add Star</button>
+  <button id="btn-del-star">- Delete Star</button>
+  <div class="sep"></div>
+  <button id="btn-export" class="primary">Export JS</button>
+  <button id="btn-copy" class="primary">Copy to Clipboard</button>
+</div>
+
+<canvas id="canvas"></canvas>
+<img id="ref-image">
+
+<div id="output-panel">
+  <div class="header">
+    <span>constellation.js — CONSTELLATIONS array</span>
+    <button id="btn-close-panel" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:16px">&times;</button>
+  </div>
+  <pre id="output-code"></pre>
+</div>
+
+<div id="status">Drag stars to reposition. Alt+drag to move focused constellation. Shift+drag/scroll for reference image. D for labels.</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Constellation data (copied from constellation.js) ──
+  var CONSTELLATIONS = [
+    {
+      name: 'Columba', primary: true, side: 1,
+      stars: [
+        { ra: 82.80, dec: -35.47, mag: 3.87, label: 'ε Col' },
+        { ra: 84.91, dec: -34.07, mag: 2.64, label: 'α Col (Phact)' },
+        { ra: 87.73, dec: -35.77, mag: 3.12, label: 'β Col (Wazn)' },
+        { ra: 89.40, dec: -35.28, mag: 4.36, label: 'γ Col' },
+        { ra: 95.53, dec: -33.44, mag: 3.85, label: 'δ Col' },
+        { ra: 89.80, dec: -42.82, mag: 3.96, label: 'η Col' },
+      ],
+      lines: [[0,1],[1,2],[2,3],[2,4],[2,5]],
+    },
+    {
+      name: 'Canis Major', side: -1,
+      stars: [
+        { ra: 95.68, dec: -17.96, mag: 1.98, label: 'β CMa (Mirzam)' },
+        { ra: 101.28, dec: -16.72, mag: -1.46, label: 'α CMa (Sirius)' },
+        { ra: 107.10, dec: -26.39, mag: 1.84, label: 'δ CMa (Wezen)' },
+        { ra: 104.65, dec: -28.97, mag: 1.50, label: 'ε CMa (Adhara)' },
+        { ra: 95.08, dec: -30.06, mag: 3.02, label: 'ζ CMa (Furud)' },
+        { ra: 111.03, dec: -29.30, mag: 2.45, label: 'η CMa (Aludra)' },
+      ],
+      lines: [[0,1],[1,2],[2,3],[2,5],[3,4],[4,0]],
+    },
+    {
+      name: 'Lepus', side: 1,
+      stars: [
+        { ra: 78.23, dec: -16.21, mag: 3.31, label: 'μ Lep' },
+        { ra: 83.18, dec: -17.82, mag: 2.58, label: 'α Lep (Arneb)' },
+        { ra: 86.73, dec: -14.82, mag: 3.55, label: 'ζ Lep' },
+        { ra: 89.10, dec: -14.17, mag: 3.72, label: 'η Lep' },
+        { ra: 82.05, dec: -20.76, mag: 2.84, label: 'β Lep (Nihal)' },
+        { ra: 76.35, dec: -22.37, mag: 3.19, label: 'ε Lep' },
+        { ra: 86.13, dec: -22.45, mag: 3.60, label: 'γ Lep' },
+        { ra: 87.80, dec: -20.88, mag: 3.81, label: 'δ Lep' },
+      ],
+      lines: [[0,1],[0,5],[1,4],[4,5],[1,2],[2,3],[2,7],[7,6],[6,4]],
+    },
+    {
+      name: 'Puppis', side: -1,
+      stars: [
+        { ra: 158.25, dec: -66.51, mag: 3.17, label: 'ν Pup' },
+        { ra: 168.08, dec: -60.41, mag: 2.70, label: 'π Pup' },
+        { ra: 171.10, dec: -66.61, mag: 3.25, label: 'σ Pup' },
+        { ra: 179.70, dec: -63.31, mag: 2.25, label: 'ζ Pup (Naos)' },
+      ],
+      lines: [[0,1],[1,2],[2,3]],
+    },
+    {
+      name: 'Caelum', side: 1,
+      stars: [
+        { ra: 70.15, dec: -41.86, mag: 4.45, label: 'α Cae' },
+        { ra: 70.50, dec: -37.14, mag: 5.05, label: 'β Cae' },
+        { ra: 76.00, dec: -35.48, mag: 4.55, label: 'γ Cae' },
+      ],
+      lines: [[0,1],[1,2]],
+    },
+    {
+      name: 'Pyxis', side: -1,
+      stars: [
+        { ra: 153.78, dec: -17.06, mag: 3.68, label: 'α Pyx' },
+        { ra: 152.91, dec: -19.18, mag: 3.97, label: 'β Pyx' },
+        { ra: 155.43, dec: -11.58, mag: 4.01, label: 'γ Pyx' },
+      ],
+      lines: [[0,1],[1,2]],
+    },
+    {
+      name: 'Vela', side: -1,
+      stars: [
+        { ra: 153.27, dec: -23.27, mag: 1.83, label: 'γ² Vel (Regor)' },
+        { ra: 160.96, dec: -28.85, mag: 3.54, label: 'ο Vel' },
+        { ra: 162.07, dec: -30.64, mag: 1.96, label: 'δ Vel (Alsephina)' },
+        { ra: 171.42, dec: -30.94, mag: 2.50, label: 'κ Vel (Markeb)' },
+        { ra: 180.07, dec: -30.50, mag: 3.54, label: 'φ Vel' },
+        { ra: 192.58, dec: -25.35, mag: 2.69, label: 'μ Vel' },
+        { ra: 173.56, dec: -16.40, mag: 3.60, label: 'ψ Vel' },
+        { ra: 167.89, dec: -19.36, mag: 2.21, label: 'λ Vel (Suhail)' },
+      ],
+      lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0]],
+    },
+    {
+      name: 'Carina', side: -1,
+      stars: [
+        { ra: 129.78, dec: -29.09, mag: -0.74, label: 'α Car (Canopus)' },
+        { ra: 151.62, dec: -23.67, mag: 3.47, label: 'χ Car' },
+        { ra: 158.27, dec: -32.63, mag: 1.86, label: 'ε Car (Avior)' },
+        { ra: 169.87, dec: -33.42, mag: 2.21, label: 'ι Car (Aspidiske)' },
+        { ra: 180.56, dec: -39.63, mag: 3.35, label: 'q Car' },
+        { ra: 182.27, dec: -45.68, mag: 2.76, label: 'θ Car' },
+        { ra: 173.91, dec: -50.79, mag: 3.32, label: 'ω Car' },
+        { ra: 166.09, dec: -47.96, mag: 1.69, label: 'β Car (Miaplacidus)' },
+        { ra: 182.72, dec: -41.04, mag: 3.27, label: 'p Car' },
+        { ra: 189.01, dec: -39.63, mag: 3.79, label: 'u Car' },
+        { ra: 187.84, dec: -45.21, mag: 4.61, label: 'z Car' },
+        { ra: 190.72, dec: -43.56, mag: 4.62, label: 'y Car' },
+        { ra: 191.62, dec: -41.04, mag: 3.83, label: 'V382 Car' },
+      ],
+      lines: [[0,7],[7,6],[6,5],[5,8],[8,4],[4,3],[3,2],[2,1],[8,9],[5,10],[10,11],[11,12],[12,9]],
+    },
+  ];
+
+  // ── Projection (same as constellation.js) ──
+  var CENTER_RA = 95;
+  var CENTER_DEC = -29;
+  var COS_CENTER = Math.cos(CENTER_DEC * Math.PI / 180);
+
+  function projectSky(ra, dec) {
+    return { x: -(ra - CENTER_RA) * COS_CENTER, y: -(dec - CENTER_DEC) };
+  }
+  function unprojectSky(sx, sy) {
+    return { ra: CENTER_RA - sx / COS_CENTER, dec: CENTER_DEC - sy };
+  }
+
+  // ── Canvas state ──
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var width, height;
+  var skyMin = { x: Infinity, y: Infinity };
+  var skyMax = { x: -Infinity, y: -Infinity };
+  var scale, ox, oy;
+  var dragStar = null;
+  var dragConst = null;
+  var hoverStar = null;
+  var hoverConst = null;
+  var showDebug = true;
+  var focusConst = 'all';
+  var addMode = false;
+  var deleteMode = false;
+  var panelOpen = false;
+
+  // Reference image (drawn on canvas for repositioning)
+  var refImg = document.getElementById('ref-image');
+  var refVisible = false;
+  var refOpacity = 0.3;
+  var refX = 0;          // canvas X of top-left corner
+  var refY = 0;          // canvas Y of top-left corner
+  var refW = 0;          // displayed width
+  var refH = 0;          // displayed height
+  var refNatW = 0;       // natural image width
+  var refNatH = 0;       // natural image height
+  var refDragging = false;
+  var refDragStartX = 0;
+  var refDragStartY = 0;
+  var refDragOrigX = 0;
+  var refDragOrigY = 0;
+
+  // Group drag (Alt+drag in focus mode)
+  var groupDragging = false;
+  var groupDragStartX = 0;
+  var groupDragStartY = 0;
+  var groupOrigPositions = null;  // snapshot of sky coords at drag start
+
+  function magToRadius(mag) {
+    if (mag < 0) return 6;
+    if (mag < 2) return 5;
+    if (mag < 3) return 4;
+    if (mag < 4) return 3;
+    return 2.5;
+  }
+
+  function computeBounds() {
+    skyMin.x = Infinity; skyMin.y = Infinity;
+    skyMax.x = -Infinity; skyMax.y = -Infinity;
+    for (var c = 0; c < CONSTELLATIONS.length; c++) {
+      var con = CONSTELLATIONS[c];
+      for (var s = 0; s < con.stars.length; s++) {
+        var sky = projectSky(con.stars[s].ra, con.stars[s].dec);
+        con.stars[s]._sx = sky.x;
+        con.stars[s]._sy = sky.y;
+        if (sky.x < skyMin.x) skyMin.x = sky.x;
+        if (sky.x > skyMax.x) skyMax.x = sky.x;
+        if (sky.y < skyMin.y) skyMin.y = sky.y;
+        if (sky.y > skyMax.y) skyMax.y = sky.y;
+      }
+    }
+    var px = (skyMax.x - skyMin.x) * 0.08;
+    var py = (skyMax.y - skyMin.y) * 0.08;
+    skyMin.x -= px; skyMax.x += px;
+    skyMin.y -= py; skyMax.y += py;
+  }
+
+  function resize() {
+    var panelW = panelOpen ? 420 : 0;
+    width = window.innerWidth - panelW;
+    height = window.innerHeight - 46;
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.marginTop = '46px';
+    computeBounds();
+    var sw = skyMax.x - skyMin.x;
+    var sh = skyMax.y - skyMin.y;
+    var pad = 0.05;
+    var uw = width * (1 - 2 * pad);
+    var uh = height * (1 - 2 * pad);
+    scale = Math.min(uw / sw, uh / sh);
+    ox = (width - sw * scale) / 2;
+    oy = (height - sh * scale) / 2;
+  }
+
+  function skyToCanvas(sx, sy) {
+    return {
+      x: ox + (sx - skyMin.x) * scale,
+      y: oy + (sy - skyMin.y) * scale,
+    };
+  }
+  function canvasToSky(cx, cy) {
+    return {
+      x: (cx - ox) / scale + skyMin.x,
+      y: (cy - oy) / scale + skyMin.y,
+    };
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Reference image (behind everything)
+    if (refVisible && refImg.complete && refImg.naturalWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = refOpacity;
+      ctx.drawImage(refImg, refX, refY, refW, refH);
+      ctx.restore();
+      // Border outline so you can see bounds when dragging
+      if (refDragging) {
+        ctx.strokeStyle = 'rgba(196,113,237,0.5)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(refX, refY, refW, refH);
+        ctx.setLineDash([]);
+      }
+    }
+
+    // Grid lines for RA/Dec
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    ctx.font = '10px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    for (var ra = 60; ra <= 170; ra += 10) {
+      var sky = projectSky(ra, CENTER_DEC);
+      var p = skyToCanvas(sky.x, sky.y);
+      ctx.beginPath();
+      ctx.moveTo(p.x, 0);
+      ctx.lineTo(p.x, height);
+      ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('RA ' + ra + '°', p.x, 4);
+    }
+    for (var dec = -75; dec <= -10; dec += 5) {
+      var sky = projectSky(CENTER_RA, dec);
+      var p = skyToCanvas(sky.x, sky.y);
+      ctx.beginPath();
+      ctx.moveTo(0, p.y);
+      ctx.lineTo(width, p.y);
+      ctx.stroke();
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Dec ' + dec + '°', 4, p.y);
+    }
+
+    // Draw constellations
+    for (var c = 0; c < CONSTELLATIONS.length; c++) {
+      var con = CONSTELLATIONS[c];
+      var dimmed = focusConst !== 'all' && con.name !== focusConst;
+      var alpha = dimmed ? 0.15 : 1.0;
+
+      // Lines
+      for (var l = 0; l < con.lines.length; l++) {
+        var a = con.stars[con.lines[l][0]];
+        var b = con.stars[con.lines[l][1]];
+        var pa = skyToCanvas(a._sx, a._sy);
+        var pb = skyToCanvas(b._sx, b._sy);
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        if (con.primary) {
+          var lg = ctx.createLinearGradient(pa.x, pa.y, pb.x, pb.y);
+          lg.addColorStop(0, 'rgba(196,113,237,' + (0.5 * alpha) + ')');
+          lg.addColorStop(1, 'rgba(246,79,89,' + (0.5 * alpha) + ')');
+          ctx.strokeStyle = lg;
+          ctx.lineWidth = 2;
+        } else {
+          ctx.strokeStyle = 'rgba(255,255,255,' + (0.3 * alpha) + ')';
+          ctx.lineWidth = 1.5;
+        }
+        ctx.stroke();
+      }
+
+      // Stars
+      for (var s = 0; s < con.stars.length; s++) {
+        var star = con.stars[s];
+        var p = skyToCanvas(star._sx, star._sy);
+        var r = magToRadius(star.mag);
+        var isHover = (hoverConst === c && hoverStar === s);
+        var isDrag = (dragConst === c && dragStar === s);
+
+        // Glow
+        var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
+        g.addColorStop(0, 'rgba(255,255,255,' + (0.3 * alpha) + ')');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r * 3, 0, 6.283);
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, 6.283);
+        ctx.fillStyle = isDrag ? '#F64F59' : isHover ? '#C471ED' : 'rgba(255,255,255,' + (0.9 * alpha) + ')';
+        ctx.fill();
+
+        // Hover ring
+        if (isHover || isDrag) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r + 4, 0, 6.283);
+          ctx.strokeStyle = isDrag ? '#F64F59' : '#C471ED';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        // Labels
+        if (showDebug && !dimmed) {
+          ctx.font = '600 11px monospace';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          var txt = '[' + s + '] ' + star.label;
+          var tw = ctx.measureText(txt).width;
+          ctx.fillStyle = 'rgba(0,0,0,0.7)';
+          ctx.fillRect(p.x + r + 4, p.y - 14, tw + 6, 16);
+          ctx.fillStyle = con.primary ? '#C471ED' : '#8CF';
+          ctx.fillText(txt, p.x + r + 7, p.y - 1);
+
+          // Coordinates below
+          var coord = 'RA=' + star.ra.toFixed(2) + ' Dec=' + star.dec.toFixed(2);
+          ctx.font = '10px monospace';
+          var cw = ctx.measureText(coord).width;
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(p.x + r + 4, p.y, cw + 6, 13);
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.fillText(coord, p.x + r + 7, p.y + 11);
+        }
+      }
+
+      // Constellation name
+      if (!dimmed) {
+        var cx = 0, maxY = -Infinity;
+        for (var s = 0; s < con.stars.length; s++) {
+          var p = skyToCanvas(con.stars[s]._sx, con.stars[s]._sy);
+          cx += p.x;
+          if (p.y > maxY) maxY = p.y;
+        }
+        cx /= con.stars.length;
+        ctx.font = (con.primary ? '700 14px' : '600 12px') + ' Inter,system-ui,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = con.primary ? 'rgba(196,113,237,0.6)' : 'rgba(255,255,255,0.3)';
+        ctx.fillText(con.name, cx, maxY + 20);
+      }
+    }
+
+    // Mode indicators
+    if (addMode) {
+      ctx.font = '600 14px Inter,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#2A9F2D';
+      ctx.fillText('ADD MODE — Click to place a new star (Esc to cancel)', width / 2, 10);
+    }
+    if (deleteMode) {
+      ctx.font = '600 14px Inter,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#F64F59';
+      ctx.fillText('DELETE MODE — Click a star to remove it (Esc to cancel)', width / 2, 10);
+    }
+  }
+
+  function findStar(mx, my) {
+    var best = null, bestDist = 20;
+    for (var c = 0; c < CONSTELLATIONS.length; c++) {
+      if (focusConst !== 'all' && CONSTELLATIONS[c].name !== focusConst) continue;
+      for (var s = 0; s < CONSTELLATIONS[c].stars.length; s++) {
+        var star = CONSTELLATIONS[c].stars[s];
+        var p = skyToCanvas(star._sx, star._sy);
+        var d = Math.sqrt((p.x - mx) * (p.x - mx) + (p.y - my) * (p.y - my));
+        if (d < bestDist) {
+          bestDist = d;
+          best = { c: c, s: s };
+        }
+      }
+    }
+    return best;
+  }
+
+  // ── Event handlers ──
+  canvas.addEventListener('mousedown', function(e) {
+    var mx = e.offsetX, my = e.offsetY;
+
+    // Shift+click: start dragging reference image
+    if (e.shiftKey && refVisible) {
+      refDragging = true;
+      refDragStartX = mx;
+      refDragStartY = my;
+      refDragOrigX = refX;
+      refDragOrigY = refY;
+      canvas.style.cursor = 'move';
+      return;
+    }
+
+    // Alt+click: start group drag (requires focus on a constellation)
+    if (e.altKey && focusConst !== 'all') {
+      var ci = CONSTELLATIONS.findIndex(function(c) { return c.name === focusConst; });
+      if (ci >= 0) {
+        groupDragging = true;
+        groupDragStartX = mx;
+        groupDragStartY = my;
+        groupOrigPositions = CONSTELLATIONS[ci].stars.map(function(s) {
+          return { ra: s.ra, dec: s.dec, _sx: s._sx, _sy: s._sy };
+        });
+        canvas.style.cursor = 'move';
+      }
+      return;
+    }
+
+    if (addMode && focusConst !== 'all') {
+      var sky = canvasToSky(mx, my);
+      var rd = unprojectSky(sky.x, sky.y);
+      var ci = CONSTELLATIONS.findIndex(function(c) { return c.name === focusConst; });
+      if (ci >= 0) {
+        var label = prompt('Star label (e.g. "α Car"):', 'new star');
+        if (label !== null) {
+          var mag = parseFloat(prompt('Magnitude:', '3.5')) || 3.5;
+          CONSTELLATIONS[ci].stars.push({
+            ra: parseFloat(rd.ra.toFixed(2)),
+            dec: parseFloat(rd.dec.toFixed(2)),
+            mag: mag,
+            label: label,
+          });
+          computeBounds();
+          draw();
+        }
+      }
+      addMode = false;
+      return;
+    }
+
+    if (deleteMode) {
+      var hit = findStar(mx, my);
+      if (hit) {
+        var con = CONSTELLATIONS[hit.c];
+        var idx = hit.s;
+        if (confirm('Delete ' + con.name + '[' + idx + '] ' + con.stars[idx].label + '?')) {
+          con.stars.splice(idx, 1);
+          // Fix line indices
+          con.lines = con.lines.filter(function(l) {
+            return l[0] !== idx && l[1] !== idx;
+          }).map(function(l) {
+            return [l[0] > idx ? l[0] - 1 : l[0], l[1] > idx ? l[1] - 1 : l[1]];
+          });
+          computeBounds();
+          draw();
+        }
+      }
+      deleteMode = false;
+      return;
+    }
+
+    var hit = findStar(mx, my);
+    if (hit) {
+      dragConst = hit.c;
+      dragStar = hit.s;
+      canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  canvas.addEventListener('mousemove', function(e) {
+    var mx = e.offsetX, my = e.offsetY;
+
+    // Dragging reference image
+    if (refDragging) {
+      refX = refDragOrigX + (mx - refDragStartX);
+      refY = refDragOrigY + (my - refDragStartY);
+      draw();
+      document.getElementById('status').textContent =
+        'Reference image: x=' + Math.round(refX) + ' y=' + Math.round(refY) +
+        ' (' + Math.round(refW) + 'x' + Math.round(refH) + ')  —  Scroll to resize, release to place';
+      return;
+    }
+
+    // Group dragging
+    if (groupDragging && groupOrigPositions) {
+      var ci = CONSTELLATIONS.findIndex(function(c) { return c.name === focusConst; });
+      if (ci >= 0) {
+        // Convert pixel delta to sky delta
+        var startSky = canvasToSky(groupDragStartX, groupDragStartY);
+        var nowSky = canvasToSky(mx, my);
+        var dsx = nowSky.x - startSky.x;
+        var dsy = nowSky.y - startSky.y;
+        // Convert sky delta to RA/Dec delta
+        var dra = -dsx / COS_CENTER;
+        var ddec = -dsy;
+        var con = CONSTELLATIONS[ci];
+        for (var s = 0; s < con.stars.length; s++) {
+          con.stars[s].ra = parseFloat((groupOrigPositions[s].ra + dra).toFixed(2));
+          con.stars[s].dec = parseFloat((groupOrigPositions[s].dec + ddec).toFixed(2));
+          con.stars[s]._sx = groupOrigPositions[s]._sx + dsx;
+          con.stars[s]._sy = groupOrigPositions[s]._sy + dsy;
+        }
+        draw();
+        document.getElementById('status').textContent =
+          'Moving ' + focusConst + ': ΔRA=' + dra.toFixed(2) + '° ΔDec=' + ddec.toFixed(2) + '°';
+      }
+      return;
+    }
+
+    if (dragStar !== null) {
+      var sky = canvasToSky(mx, my);
+      var rd = unprojectSky(sky.x, sky.y);
+      var star = CONSTELLATIONS[dragConst].stars[dragStar];
+      star.ra = parseFloat(rd.ra.toFixed(2));
+      star.dec = parseFloat(rd.dec.toFixed(2));
+      star._sx = sky.x;
+      star._sy = sky.y;
+      draw();
+      updateStatus(star);
+      return;
+    }
+
+    var hit = findStar(mx, my);
+    if (hit) {
+      hoverConst = hit.c;
+      hoverStar = hit.s;
+      canvas.style.cursor = 'grab';
+      updateStatus(CONSTELLATIONS[hit.c].stars[hit.s]);
+    } else {
+      hoverConst = null;
+      hoverStar = null;
+      canvas.style.cursor = addMode ? 'crosshair' : deleteMode ? 'not-allowed' : 'default';
+      var sky = canvasToSky(mx, my);
+      var rd = unprojectSky(sky.x, sky.y);
+      document.getElementById('status').textContent =
+        'RA=' + rd.ra.toFixed(2) + '° Dec=' + rd.dec.toFixed(2) + '°';
+    }
+    draw();
+  });
+
+  canvas.addEventListener('mouseup', function() {
+    if (refDragging) {
+      refDragging = false;
+      canvas.style.cursor = 'default';
+      draw();
+      return;
+    }
+    if (groupDragging) {
+      groupDragging = false;
+      groupOrigPositions = null;
+      canvas.style.cursor = 'default';
+      draw();
+      return;
+    }
+    if (dragStar !== null) {
+      dragStar = null;
+      dragConst = null;
+      canvas.style.cursor = 'default';
+      draw();
+    }
+  });
+
+  function updateStatus(star) {
+    document.getElementById('status').textContent =
+      star.label + '  RA=' + star.ra.toFixed(2) + '° Dec=' + star.dec.toFixed(2) + '° mag=' + star.mag.toFixed(2);
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'd' || e.key === 'D') { showDebug = !showDebug; draw(); }
+    if (e.key === 'Escape') { addMode = false; deleteMode = false; draw(); }
+  });
+
+  // ── Toolbar ──
+  var sel = document.getElementById('focus-select');
+  CONSTELLATIONS.forEach(function(con) {
+    var opt = document.createElement('option');
+    opt.value = con.name;
+    opt.textContent = con.name;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', function() {
+    focusConst = sel.value;
+    draw();
+  });
+
+  document.getElementById('btn-add-star').addEventListener('click', function() {
+    if (focusConst === 'all') {
+      alert('Select a constellation first (Focus dropdown).');
+      return;
+    }
+    addMode = true;
+    deleteMode = false;
+  });
+
+  document.getElementById('btn-del-star').addEventListener('click', function() {
+    deleteMode = true;
+    addMode = false;
+  });
+
+  // Reference image
+  document.getElementById('btn-ref').addEventListener('click', function() {
+    document.getElementById('ref-input').click();
+  });
+  document.getElementById('ref-input').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var url = URL.createObjectURL(file);
+    refImg.onload = function() {
+      refNatW = refImg.naturalWidth;
+      refNatH = refImg.naturalHeight;
+      // Fit to canvas height, maintaining aspect ratio
+      var aspect = refNatW / refNatH;
+      refH = height;
+      refW = refH * aspect;
+      // Center horizontally
+      refX = (width - refW) / 2;
+      refY = 0;
+      refVisible = true;
+      draw();
+    };
+    refImg.src = url;
+  });
+  document.getElementById('ref-opacity').addEventListener('input', function(e) {
+    refOpacity = e.target.value / 100;
+    draw();
+  });
+
+  // Shift+scroll to resize reference image (anchored at mouse position)
+  canvas.addEventListener('wheel', function(e) {
+    if (!refVisible) return;
+    if (!e.shiftKey) return;
+    e.preventDefault();
+    var mx = e.offsetX, my = e.offsetY;
+    var factor = e.deltaY < 0 ? 1.08 : 1 / 1.08;
+    var newW = refW * factor;
+    var newH = refH * factor;
+    // Anchor zoom at mouse position: keep the point under the cursor fixed
+    var pctX = (mx - refX) / refW;
+    var pctY = (my - refY) / refH;
+    refX = mx - pctX * newW;
+    refY = my - pctY * newH;
+    refW = newW;
+    refH = newH;
+    draw();
+    document.getElementById('status').textContent =
+      'Reference image: ' + Math.round(refW) + 'x' + Math.round(refH) +
+      ' (' + Math.round(refW / refNatW * 100) + '% scale)';
+  }, { passive: false });
+
+  // Export
+  function generateJS() {
+    var lines = [];
+    for (var c = 0; c < CONSTELLATIONS.length; c++) {
+      var con = CONSTELLATIONS[c];
+      lines.push('    {');
+      var props = "      name: '" + con.name + "'";
+      if (con.primary) props += ', primary: true';
+      props += ', side: ' + con.side + ',';
+      lines.push(props);
+      lines.push('      stars: [');
+      for (var s = 0; s < con.stars.length; s++) {
+        var star = con.stars[s];
+        var pad1 = star.ra < 100 ? ' ' : '';
+        var comment = '// ' + s + '  ' + star.label;
+        lines.push('        [' + pad1 + star.ra.toFixed(2) + ', ' + star.dec.toFixed(2) + ', ' + star.mag.toFixed(2) + '],   ' + comment);
+      }
+      lines.push('      ],');
+      var lineStrs = con.lines.map(function(l) { return '[' + l[0] + ',' + l[1] + ']'; });
+      lines.push('      lines: [' + lineStrs.join(',') + '],');
+      lines.push('    },');
+    }
+    return lines.join('\n');
+  }
+
+  document.getElementById('btn-export').addEventListener('click', function() {
+    panelOpen = !panelOpen;
+    document.getElementById('output-panel').classList.toggle('open');
+    if (panelOpen) {
+      document.getElementById('output-code').textContent = generateJS();
+    }
+    resize();
+    draw();
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', function() {
+    var code = generateJS();
+    navigator.clipboard.writeText(code).then(function() {
+      var btn = document.getElementById('btn-copy');
+      btn.textContent = 'Copied!';
+      setTimeout(function() { btn.textContent = 'Copy to Clipboard'; }, 1500);
+    });
+  });
+
+  document.getElementById('btn-close-panel').addEventListener('click', function() {
+    panelOpen = false;
+    document.getElementById('output-panel').classList.remove('open');
+    resize();
+    draw();
+  });
+
+  // ── Init ──
+  window.addEventListener('resize', function() { resize(); draw(); });
+  resize();
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
  * a 2D canvas. Stars drift back to their astronomically correct positions
  * via spring-damper physics after mouse interaction.
  *
- * Constellations: Columba, Canis Major, Lepus, Puppis, Caelum.
+ * Constellations: Columba, Canis Major, Lepus, Puppis, Caelum, Pyxis, Vela, Carina.
  * Respects prefers-reduced-motion by rendering a single static frame.
  */
 (function () {
@@ -35,7 +35,7 @@
   // RA converted from hours: h*15 + m*0.25
   var CONSTELLATIONS = [
     {
-      name: 'Columba', primary: true, side: -1,
+      name: 'Columba', primary: true, side: 1,
       stars: [
         [82.80, -35.47, 3.87],   // 0  ε Col
         [84.91, -34.07, 2.64],   // 1  α Col (Phact)
@@ -43,12 +43,12 @@
         [89.40, -35.28, 4.36],   // 3  γ Col
         [95.53, -33.44, 3.85],   // 4  δ Col
         [89.80, -42.82, 3.96],   // 5  η Col
-        [94.08, -35.14, 4.37],   // 6  κ Col
       ],
-      lines: [[0,1],[1,2],[2,3],[3,4],[3,6],[2,5]],
+      // IAU: ε─α─β hub, branches β─γ, β─δ, β─η (η is the southern body)
+      lines: [[0,1],[1,2],[2,3],[2,4],[2,5]],
     },
     {
-      name: 'Canis Major', side: 1,
+      name: 'Canis Major', side: -1,
       stars: [
         [95.68, -17.96, 1.98],   // 0  β CMa (Mirzam)
         [101.28, -16.72, -1.46], // 1  α CMa (Sirius)
@@ -60,7 +60,7 @@
       lines: [[0,1],[1,2],[2,3],[2,5],[3,4],[4,0]],
     },
     {
-      name: 'Lepus', side: -1,
+      name: 'Lepus', side: 1,
       stars: [
         [78.23, -16.21, 3.31],   // 0  μ Lep
         [83.18, -17.82, 2.58],   // 1  α Lep (Arneb)
@@ -71,26 +71,72 @@
         [86.13, -22.45, 3.60],   // 6  γ Lep
         [87.80, -20.88, 3.81],   // 7  δ Lep
       ],
-      lines: [[0,1],[1,4],[4,5],[1,2],[2,3],[2,7],[7,6],[6,4]],
+      // IAU: μ─α─β─ε lower, α─ζ─η upper, ζ─δ─γ─β inner loop
+      lines: [[0,1],[0,5],[1,4],[4,5],[1,2],[2,3],[2,7],[7,6],[6,4]],
     },
     {
-      name: 'Puppis', side: 1,
+      name: 'Puppis', side: -1,
       stars: [
-        [99.45, -43.20, 3.17],   // 0  ν Pup
-        [109.28, -37.10, 2.70],  // 1  π Pup
-        [112.30, -43.30, 3.25],  // 2  σ Pup
-        [120.90, -40.00, 2.25],  // 3  ζ Pup (Naos)
+        [158.25, -66.51, 3.17],  // 0  ν Pup
+        [168.08, -60.41, 2.70],  // 1  π Pup
+        [171.10, -66.61, 3.25],  // 2  σ Pup
+        [179.70, -63.31, 2.25],  // 3  ζ Pup (Naos)
       ],
       lines: [[0,1],[1,2],[2,3]],
     },
     {
-      name: 'Caelum', side: -1,
+      name: 'Caelum', side: 1,
       stars: [
         [70.15, -41.86, 4.45],   // 0  α Cae
         [70.50, -37.14, 5.05],   // 1  β Cae
         [76.00, -35.48, 4.55],   // 2  γ Cae
       ],
       lines: [[0,1],[1,2]],
+    },
+    // ── Argo Navis fragments ──────────────────────
+    {
+      name: 'Pyxis', side: -1,
+      stars: [
+        [153.78, -17.06, 3.68],  // 0  α Pyx
+        [152.91, -19.18, 3.97],  // 1  β Pyx
+        [155.43, -11.58, 4.01],  // 2  γ Pyx
+      ],
+      lines: [[0,1],[1,2]],
+    },
+    {
+      name: 'Vela', side: -1,
+      stars: [
+        [153.27, -23.27, 1.83],  // 0  γ² Vel (Regor)
+        [160.96, -28.85, 3.54],  // 1  ο Vel
+        [162.07, -30.64, 1.96],  // 2  δ Vel (Alsephina)
+        [171.42, -30.94, 2.50],  // 3  κ Vel (Markeb)
+        [180.07, -30.50, 3.54],  // 4  φ Vel
+        [192.58, -25.35, 2.69],  // 5  μ Vel
+        [173.56, -16.40, 3.60],  // 6  ψ Vel
+        [167.89, -19.36, 2.21],  // 7  λ Vel (Suhail)
+      ],
+      // Sail polygon: γ─ο─δ─κ─φ─μ (bottom) then μ─ψ─λ─γ (top)
+      lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0]],
+    },
+    {
+      name: 'Carina', side: -1,
+      stars: [
+        [129.78, -29.09, -0.74],  // 0  α Car (Canopus)
+        [151.62, -23.67,  3.47],  // 1  χ Car
+        [158.27, -32.63,  1.86],  // 2  ε Car (Avior)
+        [169.87, -33.42,  2.21],  // 3  ι Car (Aspidiske)
+        [180.56, -39.63,  3.35],  // 4  q Car
+        [182.27, -45.68,  2.76],  // 5  θ Car
+        [173.91, -50.79,  3.32],  // 6  ω Car
+        [166.09, -47.96,  1.69],  // 7  β Car (Miaplacidus)
+        [182.72, -41.04,  3.27],  // 8  p Car
+        [189.01, -39.63,  3.79],  // 9  u Car
+        [187.84, -45.21,  4.61],  // 10 z Car
+        [190.72, -43.56,  4.62],  // 11 y Car
+        [191.62, -41.04,  3.83],  // 12 V382 Car
+      ],
+      // Keel: Canopus─β─ω─θ  Upper: χ─Avior─Aspidiske─q─p─θ  Loop: θ─z─y─V382─u─p
+      lines: [[0,7],[7,6],[6,5],[5,8],[8,4],[4,3],[3,2],[2,1],[8,9],[5,10],[10,11],[11,12],[12,9]],
     },
   ];
 
@@ -113,10 +159,14 @@
 
   function projectSky(ra, dec) {
     return {
-      x: (ra - CENTER_RA) * COS_CENTER,
+      // Negate x so RA increases leftward, matching the real sky
+      x: -(ra - CENTER_RA) * COS_CENTER,
       y: -(dec - CENTER_DEC),
     };
   }
+
+  // ── Debug mode (press D to toggle) ───────────────
+  var debug = false;
 
   // ── State ─────────────────────────────────────────
   var width, height, time = 0;
@@ -139,7 +189,7 @@
   }
 
   function reproject() {
-    var pad = 0.1;
+    var pad = 0.02;
     var uw = width * (1 - 2 * pad);
     var uh = height * (1 - 2 * pad);
     var sw = skyMax.x - skyMin.x;
@@ -195,6 +245,9 @@
           primary: !!con.primary,
           side: con.side || 0,
           phase: Math.random() * 6.28,
+          // Debug info
+          label: con.name + '[' + s + ']',
+          ra: star[0], dec: star[1], mag: star[2],
         });
       }
 
@@ -357,6 +410,37 @@
       ctx.fillStyle = meta.primary ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.12)';
       ctx.fillText(meta.name, cx, maxY + 18);
     }
+
+    // Debug overlay: star labels with RA/Dec when pressing D
+    if (debug) {
+      ctx.font = '500 10px monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      for (var i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        if (!n.isStar) continue;
+        // Label background
+        var txt = n.label + '  RA=' + n.ra.toFixed(1) + ' Dec=' + n.dec.toFixed(1) + ' m=' + n.mag.toFixed(1);
+        var tw = ctx.measureText(txt).width;
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(n.x + 6, n.y - 14, tw + 4, 14);
+        // Label text
+        ctx.fillStyle = n.primary ? '#C471ED' : '#8CF';
+        ctx.fillText(txt, n.x + 8, n.y - 2);
+        // Index circle
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 5, 0, 6.283);
+        ctx.strokeStyle = n.primary ? '#C471ED' : '#8CF';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      // Help text
+      ctx.font = '600 12px monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText('DEBUG MODE (D to toggle) — Edit CONSTELLATIONS in constellation.js', 10, 10);
+    }
   }
 
   function loop() {
@@ -390,5 +474,8 @@
   }
 
   window.addEventListener('resize', resize);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'd' || e.key === 'D') debug = !debug;
+  });
   init();
 })();
