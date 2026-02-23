@@ -10,21 +10,21 @@
  *   mag  – Apparent magnitude
  *   label – Common name / Bayer designation
  *
- * Constellations: Columba, Canis Major, Lepus, Puppis, Caelum, Pyxis, Vela, Carina.
+ * Constellations: Columba, Canis Major, Lepus, Puppis, Caelum, Pyxis, Vela, Carina, Eridanus.
  */
 var CONSTELLATION_DATA = [
-    {
-      name: 'Columba', primary: true, side: 1,
-      stars: [
-        { ra: 114.44, dec: -0.75, mag: 3.87, label: 'ε Col' },
-        { ra: 116.55, dec: 0.65, mag: 2.64, label: 'α Col (Phact)' },
-        { ra: 119.37, dec: -1.05, mag: 3.12, label: 'β Col (Wazn)' },
-        { ra: 121.04, dec: -0.56, mag: 4.36, label: 'γ Col' },
-        { ra: 127.17, dec: 1.28, mag: 3.85, label: 'δ Col' },
-        { ra: 121.44, dec: -8.10, mag: 3.96, label: 'η Col' },
-      ],
-      lines: [[0,1],[1,2],[2,3],[2,4],[2,5]],
-    },
+    //     {
+    //   name: 'Columba', primary: true, side: 1,
+    //   stars: [
+    //     { ra: 133.76, dec: -3.52, mag: 3.87, label: 'ε Col' },
+    //     { ra: 135.87, dec: -2.12, mag: 2.64, label: 'α Col (Phact)' },
+    //     { ra: 138.69, dec: -3.82, mag: 3.12, label: 'β Col (Wazn)' },
+    //     { ra: 140.36, dec: -3.33, mag: 4.36, label: 'γ Col' },
+    //     { ra: 146.49, dec: -1.49, mag: 3.85, label: 'δ Col' },
+    //     { ra: 140.76, dec: -10.87, mag: 3.96, label: 'η Col' },
+    //   ],
+    //   lines: [[0,1],[1,2],[2,3],[2,4],[2,5]],
+    // },
     {
       name: 'Canis Major', side: -1,
       stars: [
@@ -74,15 +74,15 @@ var CONSTELLATION_DATA = [
       ],
       lines: [[7,8],[8,6],[6,4],[4,3],[3,2],[2,1],[1,0],[3,5],[5,6],[7,9]],
     },
-    {
-      name: 'Caelum', side: 1,
-      stars: [
-        { ra: 70.15, dec: -41.86, mag: 4.45, label: 'α Cae' },
-        { ra: 70.50, dec: -37.14, mag: 5.05, label: 'β Cae' },
-        { ra: 76.00, dec: -35.48, mag: 4.55, label: 'γ Cae' },
-      ],
-      lines: [[0,1],[1,2]],
-    },
+    // {
+    //   name: 'Caelum', side: 1,
+    //   stars: [
+    //     { ra: 70.15, dec: -41.86, mag: 4.45, label: 'α Cae' },
+    //     { ra: 70.50, dec: -37.14, mag: 5.05, label: 'β Cae' },
+    //     { ra: 76.00, dec: -35.48, mag: 4.55, label: 'γ Cae' },
+    //   ],
+    //   lines: [[0,1],[1,2]],
+    // },
     {
       name: 'Pyxis', side: -1,
       stars: [
@@ -124,5 +124,41 @@ var CONSTELLATION_DATA = [
         { ra: 210.49, dec: -37.49, mag: 3.83, label: 'V382 Car' },
       ],
       lines: [[0,7],[7,6],[6,5],[5,8],[8,4],[4,3],[3,2],[2,1],[8,9],[5,10],[10,11],[11,12],[12,9]],
+    },
+    {
+      name: 'Eridanus', side: 1,
+      stars: [
+        { ra: 111.57, dec: 22.91, mag: 2.79, label: 'β Eri (Cursa)' },
+        { ra: 105.99, dec: 24.75, mag: 4.00, label: 'μ Eri' },
+        { ra: 103.69, dec: 24.65, mag: 3.93, label: 'ν Eri' },
+        { ra: 97.58, dec: 21.16, mag: 4.03, label: 'ο¹ Eri (Beid)' },
+        { ra: 94.12, dec: 14.49, mag: 2.94, label: 'γ Eri (Zaurak)' },
+        { ra: 91.15, dec: 15.90, mag: 4.42, label: 'π Eri' },
+        { ra: 90.42, dec: 18.24, mag: 3.54, label: 'δ Eri (Rana)' },
+        { ra: 87.84, dec: 18.54, mag: 3.73, label: 'ε Eri (Ran)' },
+        { ra: 78.72, dec: 19.10, mag: 3.87, label: 'η Eri (Azha)' },
+        { ra: 75.64, dec: 14.14, mag: 4.24, label: 'π Cet' },
+        { ra: 75.89, dec: 9.43, mag: 4.46, label: 'τ¹ Eri' },
+        { ra: 80.21, dec: 4.38, mag: 4.09, label: 'τ³ Eri' },
+        { ra: 84.49, dec: 6.24, mag: 3.70, label: 'τ⁴ Eri' },
+        { ra: 88.06, dec: 6.37, mag: 4.25, label: 'τ⁵ Eri' },
+        { ra: 91.32, dec: 4.75, mag: 4.20, label: 'τ⁶ Eri' },
+        { ra: 93.04, dec: 3.39, mag: 4.62, label: 'τ⁸ Eri' },
+        { ra: 94.59, dec: 3.98, mag: 4.66, label: 'τ⁹ Eri' },
+        { ra: 102.99, dec: -1.77, mag: 4.51, label: 'υ¹ Eri' },
+        { ra: 103.50, dec: -2.56, mag: 3.82, label: 'υ² Eri' },
+        { ra: 100.62, dec: -6.02, mag: 3.96, label: '43 Eri' },
+        { ra: 99.08, dec: -5.80, mag: 3.56, label: 'υ⁴ Eri' },
+        { ra: 91.97, dec: -8.20, mag: 4.17, label: 'g Eri' },
+        { ra: 88.88, dec: -12.27, mag: 4.58, label: 'y Eri' },
+        { ra: 84.59, dec: -15.07, mag: 4.27, label: 'e Eri' },
+        { ra: 79.18, dec: -12.30, mag: 2.88, label: 'θ Eri (Acamar)' },
+        { ra: 74.78, dec: -11.86, mag: 4.12, label: 'ι Eri' },
+        { ra: 74.56, dec: -14.89, mag: 4.75, label: 's Eri' },
+        { ra: 71.36, dec: -19.70, mag: 4.25, label: 'κ Eri' },
+        { ra: 63.60, dec: -23.61, mag: 3.71, label: 'χ Eri' },
+        { ra: 59.04, dec: -29.24, mag: 0.46, label: 'α Eri (Achernar)' },
+      ],
+      lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,15],[15,16],[16,17],[17,18],[18,19],[19,20],[20,21],[21,22],[22,23],[23,24],[24,25],[25,26],[26,27],[27,28],[28,29]],
     },
 ];
