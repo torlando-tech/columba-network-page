@@ -30,115 +30,8 @@
   var CENTER_DEC = -29;
   var COS_CENTER = Math.cos(CENTER_DEC * Math.PI / 180);
 
-  // ── Star Catalog ──────────────────────────────────
-  // Each star: [RA in degrees, Dec in degrees, apparent magnitude]
-  // RA converted from hours: h*15 + m*0.25
-  var CONSTELLATIONS = [
-    {
-      name: 'Columba', primary: true, side: 1,
-      stars: [
-        [82.80, -35.47, 3.87],   // 0  ε Col
-        [84.91, -34.07, 2.64],   // 1  α Col (Phact)
-        [87.73, -35.77, 3.12],   // 2  β Col (Wazn)
-        [89.40, -35.28, 4.36],   // 3  γ Col
-        [95.53, -33.44, 3.85],   // 4  δ Col
-        [89.80, -42.82, 3.96],   // 5  η Col
-      ],
-      // IAU: ε─α─β hub, branches β─γ, β─δ, β─η (η is the southern body)
-      lines: [[0,1],[1,2],[2,3],[2,4],[2,5]],
-    },
-    {
-      name: 'Canis Major', side: -1,
-      stars: [
-        [95.68, -17.96, 1.98],   // 0  β CMa (Mirzam)
-        [101.28, -16.72, -1.46], // 1  α CMa (Sirius)
-        [107.10, -26.39, 1.84],  // 2  δ CMa (Wezen)
-        [104.65, -28.97, 1.50],  // 3  ε CMa (Adhara)
-        [95.08, -30.06, 3.02],   // 4  ζ CMa (Furud)
-        [111.03, -29.30, 2.45],  // 5  η CMa (Aludra)
-      ],
-      lines: [[0,1],[1,2],[2,3],[2,5],[3,4],[4,0]],
-    },
-    {
-      name: 'Lepus', side: 1,
-      stars: [
-        [78.23, -16.21, 3.31],   // 0  μ Lep
-        [83.18, -17.82, 2.58],   // 1  α Lep (Arneb)
-        [86.73, -14.82, 3.55],   // 2  ζ Lep
-        [89.10, -14.17, 3.72],   // 3  η Lep
-        [82.05, -20.76, 2.84],   // 4  β Lep (Nihal)
-        [76.35, -22.37, 3.19],   // 5  ε Lep
-        [86.13, -22.45, 3.60],   // 6  γ Lep
-        [87.80, -20.88, 3.81],   // 7  δ Lep
-      ],
-      // IAU: μ─α─β─ε lower, α─ζ─η upper, ζ─δ─γ─β inner loop
-      lines: [[0,1],[0,5],[1,4],[4,5],[1,2],[2,3],[2,7],[7,6],[6,4]],
-    },
-    {
-      name: 'Puppis', side: -1,
-      stars: [
-        [158.25, -66.51, 3.17],  // 0  ν Pup
-        [168.08, -60.41, 2.70],  // 1  π Pup
-        [171.10, -66.61, 3.25],  // 2  σ Pup
-        [179.70, -63.31, 2.25],  // 3  ζ Pup (Naos)
-      ],
-      lines: [[0,1],[1,2],[2,3]],
-    },
-    {
-      name: 'Caelum', side: 1,
-      stars: [
-        [70.15, -41.86, 4.45],   // 0  α Cae
-        [70.50, -37.14, 5.05],   // 1  β Cae
-        [76.00, -35.48, 4.55],   // 2  γ Cae
-      ],
-      lines: [[0,1],[1,2]],
-    },
-    // ── Argo Navis fragments ──────────────────────
-    {
-      name: 'Pyxis', side: -1,
-      stars: [
-        [153.78, -17.06, 3.68],  // 0  α Pyx
-        [152.91, -19.18, 3.97],  // 1  β Pyx
-        [155.43, -11.58, 4.01],  // 2  γ Pyx
-      ],
-      lines: [[0,1],[1,2]],
-    },
-    {
-      name: 'Vela', side: -1,
-      stars: [
-        [153.27, -23.27, 1.83],  // 0  γ² Vel (Regor)
-        [160.96, -28.85, 3.54],  // 1  ο Vel
-        [162.07, -30.64, 1.96],  // 2  δ Vel (Alsephina)
-        [171.42, -30.94, 2.50],  // 3  κ Vel (Markeb)
-        [180.07, -30.50, 3.54],  // 4  φ Vel
-        [192.58, -25.35, 2.69],  // 5  μ Vel
-        [173.56, -16.40, 3.60],  // 6  ψ Vel
-        [167.89, -19.36, 2.21],  // 7  λ Vel (Suhail)
-      ],
-      // Sail polygon: γ─ο─δ─κ─φ─μ (bottom) then μ─ψ─λ─γ (top)
-      lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0]],
-    },
-    {
-      name: 'Carina', side: -1,
-      stars: [
-        [129.78, -29.09, -0.74],  // 0  α Car (Canopus)
-        [151.62, -23.67,  3.47],  // 1  χ Car
-        [158.27, -32.63,  1.86],  // 2  ε Car (Avior)
-        [169.87, -33.42,  2.21],  // 3  ι Car (Aspidiske)
-        [180.56, -39.63,  3.35],  // 4  q Car
-        [182.27, -45.68,  2.76],  // 5  θ Car
-        [173.91, -50.79,  3.32],  // 6  ω Car
-        [166.09, -47.96,  1.69],  // 7  β Car (Miaplacidus)
-        [182.72, -41.04,  3.27],  // 8  p Car
-        [189.01, -39.63,  3.79],  // 9  u Car
-        [187.84, -45.21,  4.61],  // 10 z Car
-        [190.72, -43.56,  4.62],  // 11 y Car
-        [191.62, -41.04,  3.83],  // 12 V382 Car
-      ],
-      // Keel: Canopus─β─ω─θ  Upper: χ─Avior─Aspidiske─q─p─θ  Loop: θ─z─y─V382─u─p
-      lines: [[0,7],[7,6],[6,5],[5,8],[8,4],[4,3],[3,2],[2,1],[8,9],[5,10],[10,11],[11,12],[12,9]],
-    },
-  ];
+  // ── Star Catalog (loaded from constellation-data.js) ──
+  var CONSTELLATIONS = CONSTELLATION_DATA;
 
   // ── Helpers ───────────────────────────────────────
   function magToRadius(mag) {
@@ -199,14 +92,10 @@
     var ox = (width - sw * scale) / 2;
     var oy = (height - sh * scale) / 2;
 
-    // Slide left-group constellations left and right-group right,
-    // opening a clear corridor behind the centered hero text.
-    var spread = width * 0.13;
-
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       if (n.isStar) {
-        n.homeX = ox + (n.skyX - skyMin.x) * scale + n.side * spread;
+        n.homeX = ox + (n.skyX - skyMin.x) * scale;
         n.homeY = oy + (n.skyY - skyMin.y) * scale;
       } else {
         n.homeX = n.fx * width;
@@ -228,7 +117,7 @@
 
       for (var s = 0; s < con.stars.length; s++) {
         var star = con.stars[s];
-        var sky = projectSky(star[0], star[1]);
+        var sky = projectSky(star.ra, star.dec);
 
         if (sky.x < skyMin.x) skyMin.x = sky.x;
         if (sky.x > skyMax.x) skyMax.x = sky.x;
@@ -239,15 +128,15 @@
           skyX: sky.x, skyY: sky.y,
           homeX: 0, homeY: 0,
           x: 0, y: 0, vx: 0, vy: 0,
-          r: magToRadius(star[2]),
-          gr: magToGlow(star[2]),
+          r: magToRadius(star.mag),
+          gr: magToGlow(star.mag),
           isStar: true,
           primary: !!con.primary,
           side: con.side || 0,
           phase: Math.random() * 6.28,
           // Debug info
-          label: con.name + '[' + s + ']',
-          ra: star[0], dec: star[1], mag: star[2],
+          label: (star.label || con.name + '[' + s + ']'),
+          ra: star.ra, dec: star.dec, mag: star.mag,
         });
       }
 
@@ -439,7 +328,7 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.fillText('DEBUG MODE (D to toggle) — Edit CONSTELLATIONS in constellation.js', 10, 10);
+      ctx.fillText('DEBUG MODE (D to toggle) — Edit data in constellation-data.js', 10, 10);
     }
   }
 
